@@ -1,0 +1,250 @@
+<?php
+// Handle form submission
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Connect to database
+    $conn = new mysqli("localhost", "root", "", "detailed_academy");
+
+    if ($conn->connect_error) {
+        die("Connection failed: " . $conn->connect_error);
+    }
+
+    // Get POST data
+    $full_name = $_POST['fullName'];
+    $email = $_POST['email'];
+    $phone = $_POST['phone'];
+    $program = $_POST['program'];
+    $method = $_POST['method'];
+
+    // Insert into payments table
+    $sql = "INSERT INTO payments (full_name, email, phone, program, method)
+            VALUES ('$full_name', '$email', '$phone', '$program', '$method')";
+
+    if ($conn->query($sql) === TRUE) {
+        // Styled message and redirect after 3 seconds
+        echo "
+        <div style='
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            z-index: 9999;
+        '>
+            Payment & Enrollment Successful! Redirecting to confirmation...
+        </div>
+        <script>
+            setTimeout(function() {
+                window.location.href = 'thankyou.html';
+            }, 3000); // 3 seconds delay
+        </script>
+        ";
+    } else {
+        echo "Error: " . $conn->error;
+    }
+
+    $conn->close();
+}
+?>
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE-edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment | Detailed Academy</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:wght@400;700&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- Payment Styles -->
+  <link rel="stylesheet" href="payment.css">
+</head>
+<body>
+
+<header>
+  <nav class="mainNav">
+    <a href="index.html" class="logo">Detailed Academy</a>
+    <div class="nav-right">
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="programs2.html">Programs</a></li>
+        <li><a href="coaches.html">Coaches</a></li>
+        <li><a href="register.php">Register</a></li>   
+        <li><a href="about us.html">About Us</a></li>
+           
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<main class="pay-wrapper">
+  <div class="pay-card">
+
+    <h1 class="pay-title">Payment & Enrollment</h1>
+    <p class="pay-subtitle">
+      Fill out the details below to confirm your slot at <span>Detailed Academy</span>.
+    </p>
+
+    <form class="pay-form" action="payment.php" method="post">
+      <!-- PLAYER INFO -->
+      <div class="pay-section">
+        <h2>Player Information</h2>
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="fullName">Full Name</label>
+            <input id="fullName" name="fullName" type="text" placeholder="Juan Dela Cruz" required>
+          </div>
+          <div class="form-group">
+            <label for="email">Email Address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" required>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="form-group">
+            <label for="phone">Contact Number</label>
+            <input id="phone" name="phone" type="tel" placeholder="09XX XXX XXXX" required>
+          </div>
+          <div class="form-group">
+            <label for="program">Program</label>
+            <select id="program" name="program" required>
+              <option value="" disabled selected>Select a program</option>
+              <option value="elite" data-price="499">Elite Course – ₱499 / session</option>
+              <option value="serious" data-price="4000">Serious Hoopers Master Program – ₱4,000 / 30 days</option>
+              <option value="adult" data-price="299">Adult Camp – ₱299 / session</option>
+              <option value="beginners" data-price="0">Beginners Camp (kids) – contact us for rates</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- PAYMENT METHOD -->
+      <div class="pay-section">
+        <h2>Payment Method</h2>
+
+        <div class="pay-methods">
+          <label class="method-item">
+            <input type="radio" name="method" value="gcash" checked>
+            <span>GCash</span>
+          </label>
+
+          <label class="method-item">
+            <input type="radio" name="method" value="maya">
+            <span>Maya</span>
+          </label>
+
+          <label class="method-item">
+            <input type="radio" name="method" value="card">
+            <span>Credit / Debit Card</span>
+          </label>
+
+          <label class="method-item">
+            <input type="radio" name="method" value="cash">
+            <span>Cash On-Site</span>
+          </label>
+        </div>
+
+        <!-- CARD DETAILS (only if card is selected) -->
+        <div class="card-details" id="cardDetails">
+          <div class="form-group">
+            <label for="cardName">Name on Card</label>
+            <input id="cardName" type="text" placeholder="As shown on card">
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="cardNumber">Card Number</label>
+              <input id="cardNumber" type="text" maxlength="19" placeholder="XXXX XXXX XXXX XXXX">
+            </div>
+            <div class="form-group">
+              <label for="expiry">Expiry (MM/YY)</label>
+              <input id="expiry" type="text" maxlength="5" placeholder="MM/YY">
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="form-group">
+              <label for="cvv">CVV</label>
+              <input id="cvv" type="password" maxlength="4" placeholder="123">
+            </div>
+            <div class="form-group">
+              <label for="zip">ZIP / Postal Code</label>
+              <input id="zip" type="text" placeholder="Optional">
+            </div>
+          </div>
+          <p class="note">
+            * This is for school/project purposes only — no real payment is processed.
+          </p>
+        </div>
+      </div>
+
+      <!-- SUMMARY -->
+      <div class="pay-section summary">
+        <h2>Summary</h2>
+        <p class="summary-text">
+          Selected Program: <span id="summaryProgram">None</span><br>
+          Estimated Amount: <strong id="summaryAmount">₱0.00</strong>
+        </p>
+
+        <button type="submit" class="btn-primary">Confirm Enrollment</button>
+      </div>
+    </form>
+
+  </div>
+</main>
+
+<footer class="footer">
+  <p>&copy; 2025 Detailed Academy. All rights reserved.</p>
+</footer>
+
+<script>
+  // Show/hide card fields
+  const methodRadios = document.querySelectorAll('input[name="method"]');
+  const cardDetails = document.getElementById('cardDetails');
+
+  function updateCardVisibility() {
+    const selected = document.querySelector('input[name="method"]:checked').value;
+    cardDetails.style.display = selected === 'card' ? 'block' : 'none';
+  }
+  methodRadios.forEach(r => r.addEventListener('change', updateCardVisibility));
+  updateCardVisibility();
+
+  // Program dropdown + summary elements
+  const programSelect = document.getElementById('program');
+  const summaryProgram = document.getElementById('summaryProgram');
+  const summaryAmount = document.getElementById('summaryAmount');
+
+  function updateSummary() {
+    const option = programSelect.options[programSelect.selectedIndex];
+    const label = option ? option.text : 'None';
+    const price = option ? option.getAttribute('data-price') : null;
+
+    summaryProgram.textContent = !option || label.includes('Select') ? 'None' : label;
+
+    if (!price || price === '0') {
+      summaryAmount.textContent = 'Contact us for rates';
+    } else {
+      summaryAmount.textContent = '₱' + Number(price).toLocaleString() + '.00';
+    }
+  }
+
+  programSelect.addEventListener('change', updateSummary);
+
+  // Read ?program= from URL and pre-select it
+  const params = new URLSearchParams(window.location.search);
+  const programCode = params.get('program'); // elite / serious / adult / beginners
+  if (programCode) {
+    programSelect.value = programCode;
+  }
+  updateSummary();
+</script>
+
+</body>
+</html>
